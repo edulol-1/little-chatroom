@@ -1,3 +1,9 @@
+# Emacs temp files
+*.*~
+
+# Vim temp files
+*.*swp
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
