@@ -20,7 +20,6 @@ while True:
     message = input("> ")
 
     if message:
-        print(message)
         message = message.encode("utf-8")
         client_sock.send(message)
 
@@ -38,6 +37,3 @@ while True:
 
             received_message = data.decode("utf-8")
         print(f"other > {received_message}")
-
-
-
