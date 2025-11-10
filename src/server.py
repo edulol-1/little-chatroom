@@ -22,45 +22,32 @@ server_sock.listen(5)
 
 # List of sockets to be monitored by selec()
 socket_list = [server_sock]
-messages = {}
 
 while True:
-    readable, writable, exceptional = select.select(socket_list, socket_list, socket_list)
+    readable, _, exceptional = select.select(socket_list, [], socket_list)
 
     for sock in readable:
         # the server is available to receive new connections
         if sock is server_sock:
             conn, address = server_sock.accept()
-            print(f"New connection received from {address}")
             socket_list.append(conn)
-            messages[conn] = queue.Queue()
+            print(f"New connection received from {address}")
         else:
             data = sock.recv(1024)
-            if data:
-                for s, q in messages.items():
-                    if s is sock:
-                        continue
-                    q.put(data)
-            else:
+            if not data:
                 socket_list.remove(sock)
                 sock.close()
-                del messages[sock]
+                continue
 
-    for sock in writable:
-        try:
-            next_msg = messages[sock].get_nowait()
-        except queue.Empty:
-            print(f"{sys.stderr} output queue for {sock.getpeername()} is empty")
-            socket_list.remove(sock)
-        else:
-            print(f"Sending {next_msg} to {sock.getpeername}")
-            socket.send(next_msg)
+            for s in socket_list:
+                if (s is not server_sock) and (s is not sock):
+                    s.send(data)
 
     for sock in exceptional:
         if sock in socket_list:
             socket_list.remove(sock)
             sock.close()
-        del messages[sock]
+            print(f"Socket {sock} disconnected!")
 
 # Close the connection
 # server_sock.shutdown(socket.SHUT_RD)
