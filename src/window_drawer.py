@@ -14,7 +14,7 @@ class WindowDrawer:
         self.lower_rect_h = int(curses.LINES * 0.2)
         self.lower_rect_w = self.upper_rect_w
 
-        self.out_messages_win_h = int(curses.LINES * 0.7)
+        self.out_messages_win_h = int(curses.LINES * 0.73)
         self.out_messages_win_w = int(curses.COLS * 0.9)
         self.out_messages_win_uly = int(curses.LINES * 0.07)
         self.out_messages_win_ulx = int(curses.COLS * 0.05)
@@ -57,33 +57,44 @@ class WindowDrawer:
                                           self.out_chat_win_uly, self.out_chat_win_ulx)
         self.out_messages_win.border("|", "|", "-", "-", "+", "+", "+", "+")
         self.out_chat_win.border("|", "|", "-", "-", "+", "+", "+", "+")
+        self.messages_win.scrollok(True)
         self.messages_win.refresh()
         self.out_messages_win.refresh()
         self.chat_win.refresh()
         self.out_chat_win.refresh()
 
     def set_chatbox(self):
-        self.textbox = Textbox(self.chat_win)
-        self.textbox.edit()
-        outgoing_msg = self.textbox.gather()
-        self.messages_win.addstr(0, 0, outgoing_msg)
-        self.messages_win.refresh()
+        while True:
+            self.textbox = Textbox(self.chat_win)
+            self.textbox.edit()
+            outgoing_msg = self.textbox.gather()
+            self.chat_win.clear()
+            line_count = outgoing_msg.count("\n")
+            self.print_message(line_count, outgoing_msg)
+            self.chat_win.refresh()
 
-    def print_message(self):
-        pass
+    def print_message(self, line_count, message):
+        self.messages_win.scroll(line_count)
+        self.messages_win.refresh()
+        self.messages_win.addstr(self.messages_win_h - line_count, 0, message)
+        self.messages_win.refresh()
+        self.out_messages_win.refresh()
 
     def start_interface(self):
         try:
             self.set_rectangles()
             self.set_windows()
             self.set_chatbox()
-            curses.napms(3000)
-            curses.echo()
-            curses.endwin()
+        except KeyboardInterrupt:
+            print("See you later my friend!\n")
         except Exception as err:
             print(type(err))
             print(f"XD {err}")
             print("Terminal should be at least 100x33 in size!")
+        finally:
+            curses.napms(2000)
+            curses.echo()
+            curses.endwin()
         
 drawer = WindowDrawer()
 drawer.start_interface()
