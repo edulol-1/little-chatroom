@@ -2,7 +2,7 @@ import curses
 import sys
 from curses.textpad import Textbox, rectangle
 
-class WindowDrawer:
+class InterfaceHandler:
     def __init__(self):
         self.screen = curses.initscr()
         curses.noecho()
@@ -73,18 +73,36 @@ class WindowDrawer:
             self.print_message(line_count, outgoing_msg)
             self.chat_win.refresh()
 
-    def print_message(self, line_count, message):
+    def type_and_get_message(self):
+        self.textbox = Textbox(self.chat_win)
+        self.textbox.edit()
+        outgoing_msg = self.textbox.gather()
+        self.chat_win.clear()
+        self.chat_win.refresh()
+        return outgoing_msg
+
+    def print_message(self, message):
+        line_count = message.count("\n")
         self.messages_win.scroll(line_count)
         self.messages_win.refresh()
         self.messages_win.addstr(self.messages_win_h - line_count, 0, message)
         self.messages_win.refresh()
         self.out_messages_win.refresh()
 
+    def close(self):
+        curses.napms(2000)
+        curses.echo()
+        curses.endwin()
+
+    def launch_interface(self):
+        self.set_rectangles()
+        self.set_windows()
+
     def start_interface(self):
         try:
             self.set_rectangles()
             self.set_windows()
-            self.set_chatbox()
+            #self.set_chatbox()
         except KeyboardInterrupt:
             print("See you later my friend!\n")
         except Exception as err:
@@ -92,9 +110,7 @@ class WindowDrawer:
             print(f"XD {err}")
             print("Terminal should be at least 100x33 in size!")
         finally:
-            curses.napms(2000)
-            curses.echo()
-            curses.endwin()
-        
-drawer = WindowDrawer()
-drawer.start_interface()
+            self.close()
+            #curses.napms(2000)
+            #curses.echo()
+            #curses.endwin()
