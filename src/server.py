@@ -3,6 +3,18 @@ import socket
 import sys
 import queue
 
+class Server:
+    def __init__(self, ip_adress="127.0.0.1", port=10000):
+        self.ip_address = ip_address
+        self.port = port
+        self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_sock.setblocking(0)
+        self.server.bind((self.ip_address, self.port))
+        self.socket_list = [self.server_sock]
+
+    def listen(self):
+        self.server_sock.listen(5)
+
 # Define the header length
 # header_length = 10
 
