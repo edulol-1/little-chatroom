@@ -97,20 +97,3 @@ class InterfaceHandler:
     def launch_interface(self):
         self.set_rectangles()
         self.set_windows()
-
-    def start_interface(self):
-        try:
-            self.set_rectangles()
-            self.set_windows()
-            #self.set_chatbox()
-        except KeyboardInterrupt:
-            print("See you later my friend!\n")
-        except Exception as err:
-            print(type(err))
-            print(f"XD {err}")
-            print("Terminal should be at least 100x33 in size!")
-        finally:
-            self.close()
-            #curses.napms(2000)
-            #curses.echo()
-            #curses.endwin()
