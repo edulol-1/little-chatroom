@@ -118,26 +118,3 @@ class InterfaceHandler:
         self.set_rectangles()
         self.set_windows()
         self.set_chatbox1()
-
-# if __name__ == "__main__":
-#     interface = InterfaceHandler()
-#     interface.launch_interface()
-#     input_buffer = ""
-#     while True:
-#         ch = interface.type_and_get_ch()
-
-#         if ch == -1:
-#             continue
-#         if ch in (10, 13):
-#         #if ch == 7:
-#             interface.print_message(input_buffer)
-#             input_buffer = ""
-#             interface.clear_chat_win()
-#         elif ch in (curses.KEY_BACKSPACE, 8, 127):
-#             input_buffer = input_buffer[:-1]
-#             interface.clear_chat_win()
-#             interface.buffer_to_chat(input_buffer)
-#         else:
-#             input_buffer += chr(ch)
-#             interface.buffer_to_chat(input_buffer)
-#     interface.close()
