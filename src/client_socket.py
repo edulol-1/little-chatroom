@@ -2,7 +2,6 @@ import socket
 import sys
 import errno
 import threading
-#from interface_handler import InterfaceHandler
 
 class ClientSocket:
     def __init__(self, server_ip="127.0.0.1", server_port=10000):
@@ -28,4 +27,3 @@ class ClientSocket:
 
     def close(self):
         self.client_sock.close()
-        self.interface.close()
