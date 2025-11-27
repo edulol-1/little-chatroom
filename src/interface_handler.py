@@ -6,6 +6,7 @@ class InterfaceHandler:
     def __init__(self):
         self.screen = curses.initscr()
         curses.noecho()
+        curses.cbreak()
         curses.curs_set(1)
         
         # Set the size of all the upper part of the interface
@@ -60,8 +61,16 @@ class InterfaceHandler:
         self.messages_win.scrollok(True)
         self.messages_win.refresh()
         self.out_messages_win.refresh()
+        self.chat_win.nodelay(True)
         self.chat_win.refresh()
         self.out_chat_win.refresh()
+
+    def set_chatbox1(self):
+        self.textbox = Textbox(self.chat_win)
+
+    def clear_chatbox(self):
+        self.chat_win.clear()
+        self.chat_win.refresh()
 
     def set_chatbox(self):
         while True:
@@ -81,9 +90,20 @@ class InterfaceHandler:
         self.chat_win.refresh()
         return outgoing_msg
 
+    def type_and_get_ch(self):
+        return self.chat_win.getch()
+
+    def clear_chat_win(self):
+        self.chat_win.clear()
+        #self.chat_win.refresh()
+
+    def buffer_to_chat(self, buff):
+        self.chat_win.addstr(0, 0, buff)
+
     def print_message(self, message):
         line_count = message.count("\n")
-        self.messages_win.scroll(line_count)
+        line_count = line_count if line_count > 0 else 1
+        self.messages_win.scroll(line_count + 1)
         self.messages_win.refresh()
         self.messages_win.addstr(self.messages_win_h - line_count, 0, message)
         self.messages_win.refresh()
@@ -97,3 +117,27 @@ class InterfaceHandler:
     def launch_interface(self):
         self.set_rectangles()
         self.set_windows()
+        self.set_chatbox1()
+
+# if __name__ == "__main__":
+#     interface = InterfaceHandler()
+#     interface.launch_interface()
+#     input_buffer = ""
+#     while True:
+#         ch = interface.type_and_get_ch()
+
+#         if ch == -1:
+#             continue
+#         if ch in (10, 13):
+#         #if ch == 7:
+#             interface.print_message(input_buffer)
+#             input_buffer = ""
+#             interface.clear_chat_win()
+#         elif ch in (curses.KEY_BACKSPACE, 8, 127):
+#             input_buffer = input_buffer[:-1]
+#             interface.clear_chat_win()
+#             interface.buffer_to_chat(input_buffer)
+#         else:
+#             input_buffer += chr(ch)
+#             interface.buffer_to_chat(input_buffer)
+#     interface.close()
