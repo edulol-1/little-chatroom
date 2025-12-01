@@ -5,6 +5,7 @@ import curses
 from interface_handler import InterfaceHandler
 from client_socket import ClientSocket
 from queue import Queue
+from queue import Empty
 
 class Chatroom:
     def __init__(self):
@@ -23,21 +24,28 @@ class Chatroom:
 
     def receive_messages(self):
         while self.exit_f.empty():
-            message = self.client_sock.receive_message()
+            try:
+                message = self.client_sock.receive_message()
+            except IOError:
+                message = "Connection close by the server!"
+                self.interface.print_message(message)
+                self.exit_f.put(1)
+
             self.messages_q.put(message)
 
     def send_and_print_messages(self):
         input_buff = ""
-        while True:
+        while self.exit_f.empty():
             while not self.messages_q.empty():
                 try:
                     self.interface.print_message(self.messages_q.get_nowait())
-                except Queue.Empty:
+                except Empty:
                     pass
 
             ch = self.interface.type_and_get_ch()
             if ch == -1:
                 continue
+
             if ch in (10, 13):
                 if input_buff.lstrip() == "exit":
                     self.exit_f.put(1)
@@ -61,7 +69,9 @@ if __name__ == "__main__":
         t_recv = threading.Thread(target=chatroom.receive_messages, daemon=True)
         t_recv.start()
         chatroom.send_and_print_messages()
-        t_recv.join()
+    except KeyboardInterrupt:
+        print("See you soon!")
+        print("Connection close by server!")
     except Exception as e:
         print(f"{e}")
     finally:
