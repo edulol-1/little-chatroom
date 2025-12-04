@@ -13,9 +13,14 @@ class Chatroom:
         self.interface = InterfaceHandler()
         self.messages_q = Queue()
         self.exit_f = Queue()
+        self.username = ""
+
+    def set_username(self, username):
+        self.username = username
 
     def start(self):
         self.client_sock.connect()
+        self.client_sock.send_message(self.username)
         self.interface.launch_interface()
 
     def close(self):
@@ -63,7 +68,12 @@ class Chatroom:
                 self.interface.buffer_to_chat(input_buff)
 
 if __name__ == "__main__":
+    username = input("Introduce your username: ")
+    while len(username) > 10:
+        username = input("It must be 10 characters top!: ")
+
     chatroom = Chatroom()
+    chatroom.set_username(username)
     try:
         chatroom.start()
         t_recv = threading.Thread(target=chatroom.receive_messages, daemon=True)
@@ -71,7 +81,7 @@ if __name__ == "__main__":
         chatroom.send_and_print_messages()
     except KeyboardInterrupt:
         print("See you soon!")
-        print("Connection close by server!")
+        print("Connection closed by server!")
     except Exception as e:
         print(f"{e}")
     finally:
