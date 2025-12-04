@@ -5,12 +5,14 @@ import threading
 import select
 
 class ClientSocket:
-    def __init__(self, server_ip="127.0.0.1", server_port=10000):
-        self.server_ip = server_ip
-        self.server_port = server_port
+    def __init__(self):
+        self.server_ip = ""
+        self.server_port = ""
         self.client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    def connect(self):
+    def connect(self, server_ip="127.0.0.1", server_port=10000):
+        self.server_ip = server_ip
+        self.server_port = server_port
         self.client_sock.connect((self.server_ip, self.server_port))
         self.client_sock.setblocking(0)
 
